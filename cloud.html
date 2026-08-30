@@ -1,1 +1,756 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Hida Cloud - Premium Workspace</title>
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop');
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #06b6d4;
+      --glass-bg: rgba(15, 23, 42, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-card: rgba(30, 41, 59, 0.7);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    body {
+      background: var(--bg-image) no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 40px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: -1;
+    }
+
+    #lockScreen {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .lock-box {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 32px 24px;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .lock-box i { font-size: 40px; color: var(--primary); margin-bottom: 16px; }
+    .lock-box h2 { font-size: 22px; margin-bottom: 8px; font-weight: 700; }
+    .lock-box p { font-size: 13px; color: var(--text-sub); margin-bottom: 20px; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 16px; }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 12px 20px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: #fff; }
+    .brand i { color: var(--accent); }
+    .wita-clock { font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 20px; color: #38bdf8; }
+
+    .controls-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .tab-btn {
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      color: var(--text-sub);
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .glass-card {
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    label { font-size: 12px; font-weight: 700; color: var(--text-sub); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    input[type="text"], input[type="password"], textarea, select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    input:focus, textarea:focus { border-color: var(--primary); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .file-upload-wrapper {
+      border: 2px dashed var(--glass-border);
+      padding: 20px;
+      text-align: center;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: 0.3s;
+    }
+
+    .file-upload-wrapper:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-submit:active { transform: scale(0.98); }
+
+    .card-item {
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+      transition: transform 0.2s;
+    }
+
+    .card-item:hover { transform: translateY(-2px); }
+
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .card-title { font-weight: 700; font-size: 15px; color: #fff; }
+    .card-badge { font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: 700; background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+    .card-meta { font-size: 11px; color: var(--text-sub); margin-bottom: 10px; display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .card-preview {
+      background: rgba(15, 23, 42, 0.5);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #cbd5e1;
+      max-height: 80px;
+      overflow: hidden;
+      white-space: pre-wrap;
+      margin-bottom: 12px;
+    }
+
+    .card-actions { display: flex; gap: 8px; }
+    .btn-action {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-copy { background: #10b981; color: white; }
+    .btn-download { background: #0284c7; color: white; }
+    .btn-edit { background: rgba(255,255,255,0.1); color: #fff; }
+    .btn-del { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      padding: 16px;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    .stat-val { font-size: 24px; font-weight: 800; color: #fff; margin: 4px 0; }
+    .stat-lbl { font-size: 11px; color: var(--text-sub); text-transform: uppercase; }
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--primary);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      transition: transform 0.3s ease;
+      z-index: 10000;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- LOCK SCREEN -->
+  <div id="lockScreen">
+    <div class="lock-box">
+      <i class="fa-solid fa-shield-halved"></i>
+      <h2>Hida Cloud</h2>
+      <p>Masukkan password untuk mengakses penyimpanan aman kamu.</p>
+      <input type="password" id="passInput" placeholder="Password akses..." onkeydown="if(event.key==='Enter') unlockApp()">
+      <button class="btn-submit" onclick="unlockApp()">Buka Akses <i class="fa-solid fa-key"></i></button>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="container" id="mainApp" style="display:none;">
+
+    <!-- NAVBAR -->
+    <div class="nav-bar">
+      <div class="brand">
+        <i class="fa-solid fa-cloud-bolt"></i> Hida Cloud
+      </div>
+      <div class="wita-clock" id="clockWITA">WITA: --:--:--</div>
+    </div>
+
+    <!-- TAB NAVIGATION -->
+    <div class="controls-row">
+      <button class="tab-btn active" onclick="switchTab('items')"><i class="fa-solid fa-folder-open"></i> Semua Data</button>
+      <button class="tab-btn" onclick="switchTab('add')"><i class="fa-solid fa-plus"></i> Tambah Teks / File</button>
+      <button class="tab-btn" onclick="switchTab('analytics')"><i class="fa-solid fa-chart-pie"></i> Analisis & Stat</button>
+      <button class="tab-btn" onclick="switchTab('settings')"><i class="fa-solid fa-sliders"></i> Pengaturan Tema</button>
+      <button class="tab-btn" onclick="lockApp()"><i class="fa-solid fa-lock"></i> Kunci</button>
+    </div>
+
+    <!-- SECTION 1: LIST DATA -->
+    <div id="sec-items">
+      <input type="text" id="searchInput" placeholder="🔍 Cari judul, kategori, atau isi file..." onkeyup="renderItems()">
+      <div id="itemsContainer"></div>
+    </div>
+
+    <!-- SECTION 2: ADD / EDIT DATA -->
+    <div id="sec-add" class="glass-card" style="display:none;">
+      <h3 style="margin-bottom: 14px; font-size:16px;" id="formTitle">Tambah Data Baru</h3>
+      
+      <label>Judul Document / File</label>
+      <input type="text" id="docTitle" placeholder="Misal: Catatan QC atau Dokumen PDF">
+
+      <label>Kategori / Tag</label>
+      <input type="text" id="docCat" placeholder="Misal: Pekerjaan, Pribadi, Prompt">
+
+      <label>Tipe Data</label>
+      <select id="docType" onchange="toggleTypeInput()">
+        <option value="text">Teks / Prompt</option>
+        <option value="file">File (PDF, Gambar, Dokumen, dll)</option>
+      </select>
+
+      <!-- Input Teks -->
+      <div id="textGroup">
+        <label>Isi Teks Lengkap</label>
+        <textarea id="docText" placeholder="Ketik atau tempel teks panjang di sini..."></textarea>
+      </div>
+
+      <!-- Input File -->
+      <div id="fileGroup" style="display:none;">
+        <label>Upload File</label>
+        <div class="file-upload-wrapper" onclick="document.getElementById('fileInput').click()">
+          <i class="fa-solid fa-file-arrow-up" style="font-size: 24px; color: var(--accent); margin-bottom: 6px;"></i>
+          <p id="fileNameLbl" style="font-size: 12px; color: var(--text-sub);">Klik atau seret file ke sini</p>
+        </div>
+        <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect(event)">
+      </div>
+
+      <button class="btn-submit" onclick="saveData()" id="saveBtn">💾 Simpan ke Cloud</button>
+    </div>
+
+    <!-- SECTION 3: ANALYTICS -->
+    <div id="sec-analytics" style="display:none;">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-lbl">Total Akses Web</div>
+          <div class="stat-val" id="statOpens">0</div>
+          <div class="stat-lbl">Kali Dibuka</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Total Salin / Copy</div>
+          <div class="stat-val" id="statCopies">0</div>
+          <div class="stat-lbl">Teks Di-copy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Total Unduhan File</div>
+          <div class="stat-val" id="statDownloads">0</div>
+          <div class="stat-lbl">File Diunduh</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Memori Terpakai</div>
+          <div class="stat-val" id="statStorage">0 KB</div>
+          <div class="stat-lbl">Kapasitas Base64</div>
+        </div>
+      </div>
+
+      <!-- Top 10 Popularity -->
+      <div class="glass-card">
+        <h3 style="margin-bottom:12px; font-size:15px;"><i class="fa-solid fa-trophy" style="color:#f59e0b;"></i> Top 10 Paling Sering Digunakan</h3>
+        <div id="topRankContainer"></div>
+      </div>
+
+      <!-- Rata-Rata Aktivitas -->
+      <div class="glass-card">
+        <h3 style="margin-bottom:12px; font-size:15px;"><i class="fa-solid fa-chart-line" style="color:var(--accent);"></i> Rata-Rata Aktivitas</h3>
+        <div style="font-size: 13px; color: var(--text-sub); line-height: 1.8;">
+          <p>• Estimasi Harian: <b id="avgDaily" style="color:#fff;">0</b> interaksi/hari</p>
+          <p>• Estimasi Mingguan: <b id="avgWeekly" style="color:#fff;">0</b> interaksi/minggu</p>
+          <p>• Estimasi Bulanan: <b id="avgMonthly" style="color:#fff;">0</b> interaksi/bulan</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: SETTINGS -->
+    <div id="sec-settings" class="glass-card" style="display:none;">
+      <h3 style="margin-bottom:14px; font-size:15px;"><i class="fa-solid fa-palette"></i> Pengaturan Tampilan</h3>
+      
+      <label>URL Gambar Latar Belakang (Background)</label>
+      <input type="text" id="bgUrlInput" placeholder="https://images.unsplash.com/...">
+      <button class="btn-submit" onclick="applyCustomBg()" style="margin-bottom:16px;">Ganti Background</button>
+
+      <label>Ubah Password Akses</label>
+      <input type="password" id="newPassInput" placeholder="Password baru...">
+      <button class="btn-submit" onclick="changePassword()">Perbarui Password</button>
+    </div>
+
+  </div>
+
+  <div id="toast">Notifikasi</div>
+
+  <script>
+    const FIREBASE_URL = "https://master-prompt-db-default-rtdb.firebaseio.com/";
+
+    const DEFAULT_PASS = "maubuka";
+    let cloudData = { items: [], stats: { opens: 0, totalCopies: 0, totalDownloads: 0 } };
+    let editingId = null;
+    let selectedFileData = null;
+
+    // Realtime Clock UTC+8 (WITA)
+    function updateClock() {
+      const now = new Date();
+      const options = { timeZone: 'Asia/Makassar', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      const timeStr = new Intl.DateTimeFormat('id-ID', options).format(now);
+      document.getElementById('clockWITA').innerText = `WITA: ${timeStr}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Lock System
+    function unlockApp() {
+      const input = document.getElementById('passInput').value;
+      const savedPass = localStorage.getItem('hida_cloud_pass') || DEFAULT_PASS;
+
+      if (input === savedPass) {
+        document.getElementById('lockScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        initApp();
+      } else {
+        alert('❌ Password Salah!');
+      }
+    }
+
+    function lockApp() {
+      document.getElementById('lockScreen').style.display = 'flex';
+      document.getElementById('mainApp').style.display = 'none';
+      document.getElementById('passInput').value = '';
+    }
+
+    // App Init
+    async function initApp() {
+      const customBg = localStorage.getItem('hida_cloud_bg');
+      if (customBg) document.documentElement.style.setProperty('--bg-image', `url('${customBg}')`);
+
+      await loadFromFirebase();
+      
+      cloudData.stats.opens = (cloudData.stats.opens || 0) + 1;
+      await syncToFirebase();
+      
+      renderItems();
+      renderAnalytics();
+    }
+
+    // Firebase Sync
+    async function loadFromFirebase() {
+      try {
+        const res = await fetch(`${FIREBASE_URL}/hida_cloud.json`);
+        const data = await res.json();
+        if (data) {
+          cloudData = data;
+          if (!cloudData.items) cloudData.items = [];
+          if (!cloudData.stats) cloudData.stats = { opens: 0, totalCopies: 0, totalDownloads: 0 };
+        }
+      } catch(e) {
+        console.error("Firebase error, fallback ke local", e);
+        const local = localStorage.getItem('hida_cloud_local');
+        if (local) cloudData = JSON.parse(local);
+      }
+    }
+
+    async function syncToFirebase() {
+      localStorage.setItem('hida_cloud_local', JSON.stringify(cloudData));
+      try {
+        await fetch(`${FIREBASE_URL}/hida_cloud.json`, {
+          method: 'PUT',
+          body: JSON.stringify(cloudData),
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch(e) {
+        console.error("Failed sync Firebase", e);
+      }
+    }
+
+    // Tab Navigation
+    function switchTab(tab) {
+      ['items', 'add', 'analytics', 'settings'].forEach(t => {
+        document.getElementById(`sec-${t}`).style.display = t === tab ? 'block' : 'none';
+      });
+      document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', ['items', 'add', 'analytics', 'settings', 'lock'][idx] === tab);
+      });
+      if (tab === 'analytics') renderAnalytics();
+    }
+
+    function toggleTypeInput() {
+      const type = document.getElementById('docType').value;
+      document.getElementById('textGroup').style.display = type === 'text' ? 'block' : 'none';
+      document.getElementById('fileGroup').style.display = type === 'file' ? 'block' : 'none';
+    }
+
+    // File Handler
+    function handleFileSelect(evt) {
+      const file = evt.target.files[0];
+      if (!file) return;
+
+      if (file.size > 8 * 1024 * 1024) {
+        showToast("⚠️ Ukuran file maksimal 8MB!");
+        return;
+      }
+
+      document.getElementById('fileNameLbl').innerText = `${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        selectedFileData = {
+          name: file.name,
+          type: file.type,
+          base64: e.target.result
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Helper Date WITA
+    function getWITADateString() {
+      const options = { timeZone: 'Asia/Makassar', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      return new Intl.DateTimeFormat('id-ID', options).format(new Date()) + " WITA";
+    }
+
+    // Save Data
+    async function saveData() {
+      const title = document.getElementById('docTitle').value.trim();
+      const cat = document.getElementById('docCat').value.trim() || 'General';
+      const type = document.getElementById('docType').value;
+
+      if (!title) {
+        showToast("⚠️ Judul wajib diisi!");
+        return;
+      }
+
+      const nowWITA = getWITADateString();
+
+      if (editingId !== null) {
+        cloudData.items = cloudData.items.map(item => {
+          if (item.id === editingId) {
+            return {
+              ...item,
+              title,
+              category: cat,
+              updatedAt: nowWITA,
+              text: type === 'text' ? document.getElementById('docText').value : item.text,
+              file: type === 'file' && selectedFileData ? selectedFileData : item.file
+            };
+          }
+          return item;
+        });
+        showToast("✏️ Data berhasil diperbarui!");
+        editingId = null;
+      } else {
+        const newItem = {
+          id: Date.now(),
+          title,
+          category: cat,
+          type,
+          text: type === 'text' ? document.getElementById('docText').value : '',
+          file: type === 'file' ? selectedFileData : null,
+          createdAt: nowWITA,
+          updatedAt: nowWITA,
+          usageCount: 0
+        };
+        cloudData.items.unshift(newItem);
+        showToast("💾 Data berhasil disimpan!");
+      }
+
+      resetForm();
+      await syncToFirebase();
+      switchTab('items');
+      renderItems();
+    }
+
+    function resetForm() {
+      document.getElementById('docTitle').value = '';
+      document.getElementById('docCat').value = '';
+      document.getElementById('docText').value = '';
+      document.getElementById('fileInput').value = '';
+      document.getElementById('fileNameLbl').innerText = 'Klik atau seret file ke sini';
+      selectedFileData = null;
+      editingId = null;
+      document.getElementById('formTitle').innerText = 'Tambah Data Baru';
+      document.getElementById('saveBtn').innerText = '💾 Simpan ke Cloud';
+    }
+
+    // Render Data Cards
+    function renderItems() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const container = document.getElementById('itemsContainer');
+      container.innerHTML = '';
+
+      const filtered = cloudData.items.filter(i => 
+        i.title.toLowerCase().includes(q) || 
+        i.category.toLowerCase().includes(q)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sub); font-size:13px;">Belum ada data tersimpan.</div>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card-item';
+        
+        const isFile = item.type === 'file';
+        
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="card-title">${escapeHtml(item.title)}</div>
+            <span class="card-badge">${isFile ? '📁 FILE' : '📝 TEKS'} | ${escapeHtml(item.category)}</span>
+          </div>
+          <div class="card-meta">
+            <span><i class="fa-regular fa-clock"></i> Dibuat: ${item.createdAt}</span>
+            <span><i class="fa-solid fa-pen-to-square"></i> Diubah: ${item.updatedAt}</span>
+            <span><i class="fa-solid fa-chart-simple"></i> Digunakan: ${item.usageCount || 0}x</span>
+          </div>
+          ${isFile 
+            ? `<div class="card-preview"><i class="fa-solid fa-paperclip"></i> ${item.file ? item.file.name : 'File Lampiran'}</div>`
+            : `<div class="card-preview">${escapeHtml(item.text)}</div>`
+          }
+          <div class="card-actions">
+            ${isFile 
+              ? `<button class="btn-action btn-download" onclick="downloadFile(${item.id})"><i class="fa-solid fa-download"></i> Unduh File</button>`
+              : `<button class="btn-action btn-copy" onclick="copyText(${item.id})"><i class="fa-regular fa-copy"></i> Salin Teks</button>`
+            }
+            <button class="btn-action btn-edit" onclick="editItem(${item.id})"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button class="btn-action btn-del" onclick="deleteItem(${item.id})"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Actions
+    async function copyText(id) {
+      const target = cloudData.items.find(i => i.id === id);
+      if (target) {
+        navigator.clipboard.writeText(target.text);
+        target.usageCount = (target.usageCount || 0) + 1;
+        cloudData.stats.totalCopies = (cloudData.stats.totalCopies || 0) + 1;
+        showToast("📋 Teks tersalin ke clipboard!");
+        renderItems();
+        await syncToFirebase();
+      }
+    }
+
+    async function downloadFile(id) {
+      const target = cloudData.items.find(i => i.id === id);
+      if (target && target.file) {
+        const a = document.createElement('a');
+        a.href = target.file.base64;
+        a.download = target.file.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        target.usageCount = (target.usageCount || 0) + 1;
+        cloudData.stats.totalDownloads = (cloudData.stats.totalDownloads || 0) + 1;
+        showToast("📥 Mengunduh file...");
+        renderItems();
+        await syncToFirebase();
+      }
+    }
+
+    function editItem(id) {
+      const target = cloudData.items.find(i => i.id === id);
+      if (target) {
+        editingId = id;
+        document.getElementById('docTitle').value = target.title;
+        document.getElementById('docCat').value = target.category;
+        document.getElementById('docType').value = target.type;
+        toggleTypeInput();
+        
+        if (target.type === 'text') document.getElementById('docText').value = target.text;
+        
+        document.getElementById('formTitle').innerText = 'Edit Data';
+        document.getElementById('saveBtn').innerText = '🔄 Perbarui Data';
+        switchTab('add');
+      }
+    }
+
+    async function deleteItem(id) {
+      if (confirm("Hapus dokumen/file ini dari Hida Cloud?")) {
+        cloudData.items = cloudData.items.filter(i => i.id !== id);
+        showToast("🗑️ Data dihapus");
+        renderItems();
+        await syncToFirebase();
+      }
+    }
+
+    // Analytics Calculation
+    function renderAnalytics() {
+      document.getElementById('statOpens').innerText = cloudData.stats.opens || 0;
+      document.getElementById('statCopies').innerText = cloudData.stats.totalCopies || 0;
+      document.getElementById('statDownloads').innerText = cloudData.stats.totalDownloads || 0;
+
+      const str = JSON.stringify(cloudData);
+      const bytes = new Blob([str]).size;
+      document.getElementById('statStorage').innerText = (bytes / 1024).toFixed(1) + " KB";
+
+      const sorted = [...cloudData.items].sort((a,b) => (b.usageCount||0) - (a.usageCount||0)).slice(0, 10);
+      const topContainer = document.getElementById('topRankContainer');
+      topContainer.innerHTML = '';
+
+      if (sorted.length === 0) {
+        topContainer.innerHTML = '<div style="font-size:12px; color:var(--text-sub);">Belum ada data aktivitas.</div>';
+      } else {
+        sorted.forEach((item, idx) => {
+          const div = document.createElement('div');
+          div.style.cssText = 'display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);';
+          div.innerHTML = `<span><b>#${idx+1}</b> ${escapeHtml(item.title)}</span><span style="color:var(--accent); font-weight:700;">${item.usageCount||0}x dipakai</span>`;
+          topContainer.appendChild(div);
+        });
+      }
+
+      const totalActions = (cloudData.stats.totalCopies||0) + (cloudData.stats.totalDownloads||0);
+      document.getElementById('avgDaily').innerText = (totalActions / 30).toFixed(1);
+      document.getElementById('avgWeekly').innerText = (totalActions / 4).toFixed(1);
+      document.getElementById('avgMonthly').innerText = totalActions;
+    }
+
+    // Settings
+    function applyCustomBg() {
+      const url = document.getElementById('bgUrlInput').value.trim();
+      if (url) {
+        localStorage.setItem('hida_cloud_bg', url);
+        document.documentElement.style.setProperty('--bg-image', `url('${url}')`);
+        showToast("🎨 Background diperbarui!");
+      }
+    }
+
+    function changePassword() {
+      const newP = document.getElementById('newPassInput').value.trim();
+      if (newP) {
+        localStorage.setItem('hida_cloud_pass', newP);
+        showToast("🔑 Password berhasil diganti!");
+        document.getElementById('newPassInput').value = '';
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function escapeHtml(text) {
+      return (text || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>
 
