@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Hida Cloud - Premium Workspace</title>
   <!-- Google Fonts & FontAwesome Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
@@ -143,7 +143,45 @@
     }
 
     input:focus, textarea:focus { border-color: var(--primary); }
-    textarea { resize: vertical; min-height: 80px; }
+    textarea { resize: vertical; min-height: 120px; }
+
+    /* Terminal Code-Editor Style Area */
+    .terminal-editor {
+      font-family: 'Fira Code', 'Consolas', monospace !important;
+      background: #0d1117 !important;
+      color: #38bdf8 !important;
+      border: 1px solid #30363d !important;
+      line-height: 1.6;
+      font-size: 13px;
+      tab-size: 2;
+    }
+
+    .editor-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .btn-fullscreen-trigger {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .btn-fullscreen-trigger:hover {
+      background: var(--accent);
+      color: #000;
+    }
 
     .file-upload-wrapper {
       border: 2px dashed var(--glass-border);
@@ -191,15 +229,17 @@
     .card-meta { font-size: 11px; color: var(--text-sub); margin-bottom: 10px; display: flex; gap: 12px; flex-wrap: wrap; }
 
     .card-preview {
-      background: rgba(15, 23, 42, 0.5);
+      background: #0d1117;
       padding: 10px;
       border-radius: 8px;
       font-size: 12px;
-      color: #cbd5e1;
-      max-height: 80px;
+      color: #94a3b8;
+      font-family: 'Fira Code', monospace;
+      max-height: 100px;
       overflow: hidden;
       white-space: pre-wrap;
       margin-bottom: 12px;
+      border: 1px solid #21262d;
     }
 
     .card-actions { display: flex; gap: 8px; }
@@ -240,6 +280,82 @@
     .stat-val { font-size: 24px; font-weight: 800; color: #fff; margin: 4px 0; }
     .stat-lbl { font-size: 11px; color: var(--text-sub); text-transform: uppercase; }
 
+    /* FULLSCREEN TERMINAL EDITOR MODAL */
+    #editorModal {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #090d16;
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+      padding: 16px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #21262d;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-family: 'Fira Code', monospace;
+      color: #38bdf8;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .modal-btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modal-btn-close { background: #ef4444; color: #fff; }
+    .modal-btn-save { background: #10b981; color: #fff; }
+    .modal-btn-copy { background: #0284c7; color: #fff; }
+
+    .fullscreen-textarea {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      background: #0d1117 !important;
+      color: #e6edf3 !important;
+      font-family: 'Fira Code', 'Consolas', monospace !important;
+      font-size: 14px !important;
+      line-height: 1.6 !important;
+      padding: 16px !important;
+      border: 1px solid #30363d !important;
+      border-radius: 12px !important;
+      outline: none !important;
+      resize: none !important;
+      margin-bottom: 12px !important;
+    }
+
+    .modal-footer-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #8b949e;
+      font-family: 'Fira Code', monospace;
+    }
+
     #toast {
       position: fixed;
       bottom: 20px;
@@ -254,7 +370,7 @@
       font-weight: 600;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       transition: transform 0.3s ease;
-      z-index: 10000;
+      z-index: 100000;
     }
 
     #toast.show { transform: translateX(-50%) translateY(0); }
@@ -317,8 +433,13 @@
 
       <!-- Input Teks -->
       <div id="textGroup">
-        <label>Isi Teks Lengkap</label>
-        <textarea id="docText" placeholder="Ketik atau tempel teks panjang di sini..."></textarea>
+        <div class="editor-label-row">
+          <label style="margin-bottom:0;">Isi Teks Lengkap</label>
+          <button class="btn-fullscreen-trigger" onclick="openFullscreenEditor()">
+            <i class="fa-solid fa-expand"></i> Mode Layar Penuh
+          </button>
+        </div>
+        <textarea id="docText" class="terminal-editor" placeholder="Ketik atau tempel teks panjang di sini..."></textarea>
       </div>
 
       <!-- Input File -->
@@ -389,6 +510,25 @@
       <button class="btn-submit" onclick="changePassword()">Perbarui Password</button>
     </div>
 
+  </div>
+
+  <!-- FULLSCREEN TERMINAL EDITOR MODAL -->
+  <div id="editorModal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <i class="fa-solid fa-terminal"></i> Terminal Fullscreen Editor
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-copy" onclick="copyFullscreenText()"><i class="fa-regular fa-copy"></i> Salin</button>
+        <button class="modal-btn modal-btn-save" onclick="applyFullscreenEditor()"><i class="fa-solid fa-check"></i> Selesai</button>
+        <button class="modal-btn modal-btn-close" onclick="closeFullscreenEditor()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <textarea id="fullscreenTextarea" class="fullscreen-textarea" placeholder="Tulis atau paste teks panjang di sini..." oninput="updateEditorStats()"></textarea>
+    <div class="modal-footer-stats">
+      <span id="editorBarisStat">Baris: 1</span>
+      <span id="editorKarakterStat">Karakter: 0</span>
+    </div>
   </div>
 
   <div id="toast">Notifikasi</div>
@@ -490,6 +630,44 @@
       const type = document.getElementById('docType').value;
       document.getElementById('textGroup').style.display = type === 'text' ? 'block' : 'none';
       document.getElementById('fileGroup').style.display = type === 'file' ? 'block' : 'none';
+    }
+
+    /* FULLSCREEN EDITOR CONTROLLERS */
+    function openFullscreenEditor() {
+      const currentText = document.getElementById('docText').value;
+      const modal = document.getElementById('editorModal');
+      const textarea = document.getElementById('fullscreenTextarea');
+      
+      textarea.value = currentText;
+      modal.style.display = 'flex';
+      updateEditorStats();
+      textarea.focus();
+    }
+
+    function closeFullscreenEditor() {
+      document.getElementById('editorModal').style.display = 'none';
+    }
+
+    function applyFullscreenEditor() {
+      const text = document.getElementById('fullscreenTextarea').value;
+      document.getElementById('docText').value = text;
+      closeFullscreenEditor();
+      showToast("✅ Teks diperbarui dari Mode Fullscreen!");
+    }
+
+    function copyFullscreenText() {
+      const text = document.getElementById('fullscreenTextarea').value;
+      navigator.clipboard.writeText(text);
+      showToast("📋 Teks tersalin!");
+    }
+
+    function updateEditorStats() {
+      const val = document.getElementById('fullscreenTextarea').value;
+      const lines = val ? val.split('\n').length : 1;
+      const chars = val.length;
+
+      document.getElementById('editorBarisStat').innerText = `Baris: ${lines}`;
+      document.getElementById('editorKarakterStat').innerText = `Karakter: ${chars}`;
     }
 
     // File Handler
@@ -673,7 +851,9 @@
         document.getElementById('docType').value = target.type;
         toggleTypeInput();
         
-        if (target.type === 'text') document.getElementById('docText').value = target.text;
+        if (target.type === 'text') {
+          document.getElementById('docText').value = target.text;
+        }
         
         document.getElementById('formTitle').innerText = 'Edit Data';
         document.getElementById('saveBtn').innerText = '🔄 Perbarui Data';
@@ -753,4 +933,3 @@
   </script>
 </body>
 </html>
-
