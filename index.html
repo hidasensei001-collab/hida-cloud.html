@@ -501,9 +501,9 @@
     <div id="sec-settings" class="glass-card" style="display:none;">
       <h3 style="margin-bottom:14px; font-size:15px;"><i class="fa-solid fa-palette"></i> Pengaturan Tampilan</h3>
       
-      <label>URL Gambar Latar Belakang (Background)</label>
+      <label>URL Gambar Latar Belakang (Global untuk Semua Perangkat)</label>
       <input type="text" id="bgUrlInput" placeholder="https://images.unsplash.com/...">
-      <button class="btn-submit" onclick="applyCustomBg()" style="margin-bottom:16px;">Ganti Background</button>
+      <button class="btn-submit" onclick="applyCustomBg()" style="margin-bottom:16px;">Ganti Background Global</button>
 
       <label>Ubah Password Akses</label>
       <input type="password" id="newPassInput" placeholder="Password baru...">
@@ -537,7 +537,7 @@
     const FIREBASE_URL = "https://master-prompt-db-default-rtdb.firebaseio.com/";
 
     const DEFAULT_PASS = "maubuka";
-    let cloudData = { items: [], stats: { opens: 0, totalCopies: 0, totalDownloads: 0 } };
+    let cloudData = { items: [], stats: { opens: 0, totalCopies: 0, totalDownloads: 0 }, bgUrl: "" };
     let editingId = null;
     let selectedFileData = null;
 
@@ -573,9 +573,6 @@
 
     // App Init
     async function initApp() {
-      const customBg = localStorage.getItem('hida_cloud_bg');
-      if (customBg) document.documentElement.style.setProperty('--bg-image', `url('${customBg}')`);
-
       await loadFromFirebase();
       
       cloudData.stats.opens = (cloudData.stats.opens || 0) + 1;
@@ -594,11 +591,22 @@
           cloudData = data;
           if (!cloudData.items) cloudData.items = [];
           if (!cloudData.stats) cloudData.stats = { opens: 0, totalCopies: 0, totalDownloads: 0 };
+          
+          // Terapkan background global jika tersimpan di cloud
+          if (cloudData.bgUrl) {
+            document.documentElement.style.setProperty('--bg-image', `url('${cloudData.bgUrl}')`);
+          } else {
+            const localBg = localStorage.getItem('hida_cloud_bg');
+            if (localBg) document.documentElement.style.setProperty('--bg-image', `url('${localBg}')`);
+          }
         }
       } catch(e) {
         console.error("Firebase error, fallback ke local", e);
         const local = localStorage.getItem('hida_cloud_local');
-        if (local) cloudData = JSON.parse(local);
+        if (local) {
+          cloudData = JSON.parse(local);
+          if (cloudData.bgUrl) document.documentElement.style.setProperty('--bg-image', `url('${cloudData.bgUrl}')`);
+        }
       }
     }
 
@@ -902,12 +910,15 @@
     }
 
     // Settings
-    function applyCustomBg() {
+    async function applyCustomBg() {
       const url = document.getElementById('bgUrlInput').value.trim();
       if (url) {
+        cloudData.bgUrl = url;
         localStorage.setItem('hida_cloud_bg', url);
         document.documentElement.style.setProperty('--bg-image', `url('${url}')`);
-        showToast("🎨 Background diperbarui!");
+        await syncToFirebase();
+        showToast("🎨 Background diperbarui untuk SEMUA perangkat!");
+        document.getElementById('bgUrlInput').value = '';
       }
     }
 
